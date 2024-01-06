@@ -1,0 +1,1370 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE LambdaCase        #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Language.Rzk.VSCode.Tokenize</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Language.LSP.Protocol.Types</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">SemanticTokenAbsolute</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-6"></span><span>                                              </span><span class="annot"><span class="hs-identifier">SemanticTokenModifiers</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-7"></span><span>                                              </span><span class="annot"><span class="hs-identifier">SemanticTokenTypes</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Language.Rzk.Syntax.html"><span class="hs-identifier">Language.Rzk.Syntax</span></a></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="annot"><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeModule"><span class="hs-identifier hs-type">tokenizeModule</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Module"><span class="hs-identifier hs-type">Module</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenAbsolute</span></span><span class="hs-special">]</span><span>
+</span><span id="line-11"></span><span id="tokenizeModule"><span class="annot"><span class="annottext">tokenizeModule :: Module -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeModule"><span class="hs-identifier hs-var hs-var">tokenizeModule</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Module"><span class="hs-identifier hs-type">Module</span></a></span><span> </span><span id="local-6989586621679725252"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725252"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725253"><span class="annot"><span class="annottext">LanguageDecl' BNFC'Position
+</span><a href="#local-6989586621679725253"><span class="hs-identifier hs-var">langDecl</span></a></span></span><span> </span><span id="local-6989586621679725254"><span class="annot"><span class="annottext">[Command' BNFC'Position]
+</span><a href="#local-6989586621679725254"><span class="hs-identifier hs-var">commands</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">LanguageDecl' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeLanguageDecl"><span class="hs-identifier hs-var">tokenizeLanguageDecl</span></a></span><span> </span><span class="annot"><span class="annottext">LanguageDecl' BNFC'Position
+</span><a href="#local-6989586621679725253"><span class="hs-identifier hs-var">langDecl</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Command' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Command' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Command' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeCommand"><span class="hs-identifier hs-var">tokenizeCommand</span></a></span><span> </span><span class="annot"><span class="annottext">[Command' BNFC'Position]
+</span><a href="#local-6989586621679725254"><span class="hs-identifier hs-var">commands</span></a></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">]</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="annot"><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeLanguageDecl"><span class="hs-identifier hs-type">tokenizeLanguageDecl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#LanguageDecl"><span class="hs-identifier hs-type">LanguageDecl</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenAbsolute</span></span><span class="hs-special">]</span><span>
+</span><span id="line-17"></span><span id="tokenizeLanguageDecl"><span class="annot"><span class="annottext">tokenizeLanguageDecl :: LanguageDecl' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeLanguageDecl"><span class="hs-identifier hs-var hs-var">tokenizeLanguageDecl</span></a></span></span><span> </span><span class="annot"><span class="annottext">LanguageDecl' BNFC'Position
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="annot"><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeCommand"><span class="hs-identifier hs-type">tokenizeCommand</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Command"><span class="hs-identifier hs-type">Command</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenAbsolute</span></span><span class="hs-special">]</span><span>
+</span><span id="line-20"></span><span id="tokenizeCommand"><span class="annot"><span class="annottext">tokenizeCommand :: Command' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeCommand"><span class="hs-identifier hs-var hs-var">tokenizeCommand</span></a></span></span><span> </span><span id="local-6989586621679725261"><span class="annot"><span class="annottext">Command' BNFC'Position
+</span><a href="#local-6989586621679725261"><span class="hs-identifier hs-var">command</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Command' BNFC'Position
+</span><a href="#local-6989586621679725261"><span class="hs-identifier hs-var">command</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-21"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CommandSetOption"><span class="hs-identifier hs-type">CommandSetOption</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>    </span><span class="hs-comment">-- NOTE: fallback to TextMate</span><span>
+</span><span id="line-22"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CommandUnsetOption"><span class="hs-identifier hs-type">CommandUnsetOption</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>    </span><span class="hs-comment">-- NOTE: fallback to TextMate</span><span>
+</span><span id="line-23"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CommandCheck"><span class="hs-identifier hs-type">CommandCheck</span></a></span><span>        </span><span id="local-6989586621679725265"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725265"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725266"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725266"><span class="hs-identifier hs-var">term</span></a></span></span><span> </span><span id="local-6989586621679725267"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725267"><span class="hs-identifier hs-var">type_</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725266"><span class="hs-identifier hs-var">term</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725267"><span class="hs-identifier hs-var">type_</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-24"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CommandCompute"><span class="hs-identifier hs-type">CommandCompute</span></a></span><span>      </span><span id="local-6989586621679725270"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725270"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725271"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725271"><span class="hs-identifier hs-var">term</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725271"><span class="hs-identifier hs-var">term</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CommandComputeNF"><span class="hs-identifier hs-type">CommandComputeNF</span></a></span><span>    </span><span id="local-6989586621679725273"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725273"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725274"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725274"><span class="hs-identifier hs-var">term</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725274"><span class="hs-identifier hs-var">term</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CommandComputeWHNF"><span class="hs-identifier hs-type">CommandComputeWHNF</span></a></span><span>  </span><span id="local-6989586621679725276"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725276"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725277"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725277"><span class="hs-identifier hs-var">term</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725277"><span class="hs-identifier hs-var">term</span></a></span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CommandPostulate"><span class="hs-identifier hs-type">CommandPostulate</span></a></span><span> </span><span id="local-6989586621679725279"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725279"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725280"><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+</span><a href="#local-6989586621679725280"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679725281"><span class="annot"><span class="annottext">DeclUsedVars' BNFC'Position
+</span><a href="#local-6989586621679725281"><span class="hs-identifier hs-var">_declUsedVars</span></a></span></span><span> </span><span id="local-6989586621679725282"><span class="annot"><span class="annottext">[Param' BNFC'Position]
+</span><a href="#local-6989586621679725282"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679725283"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725283"><span class="hs-identifier hs-var">type_</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-29"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+</span><a href="#local-6989586621679725280"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Function</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_Declaration</span></span><span class="hs-special">]</span><span>
+</span><span id="line-30"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Param' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Param' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Param' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeParam"><span class="hs-identifier hs-var">tokenizeParam</span></a></span><span> </span><span class="annot"><span class="annottext">[Param' BNFC'Position]
+</span><a href="#local-6989586621679725282"><span class="hs-identifier hs-var">params</span></a></span><span>
+</span><span id="line-31"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725283"><span class="hs-identifier hs-var">type_</span></a></span><span>
+</span><span id="line-32"></span><span>    </span><span class="hs-special">]</span><span>
+</span><span id="line-33"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CommandDefine"><span class="hs-identifier hs-type">CommandDefine</span></a></span><span> </span><span id="local-6989586621679725289"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725289"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725290"><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+</span><a href="#local-6989586621679725290"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679725291"><span class="annot"><span class="annottext">DeclUsedVars' BNFC'Position
+</span><a href="#local-6989586621679725291"><span class="hs-identifier hs-var">_declUsedVars</span></a></span></span><span> </span><span id="local-6989586621679725292"><span class="annot"><span class="annottext">[Param' BNFC'Position]
+</span><a href="#local-6989586621679725292"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679725293"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725293"><span class="hs-identifier hs-var">type_</span></a></span></span><span> </span><span id="local-6989586621679725294"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725294"><span class="hs-identifier hs-var">term</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-34"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+</span><a href="#local-6989586621679725290"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Function</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_Declaration</span></span><span class="hs-special">]</span><span>
+</span><span id="line-35"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Param' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Param' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Param' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeParam"><span class="hs-identifier hs-var">tokenizeParam</span></a></span><span> </span><span class="annot"><span class="annottext">[Param' BNFC'Position]
+</span><a href="#local-6989586621679725292"><span class="hs-identifier hs-var">params</span></a></span><span>
+</span><span id="line-36"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725293"><span class="hs-identifier hs-var">type_</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725294"><span class="hs-identifier hs-var">term</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-37"></span><span>    </span><span class="hs-special">]</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CommandAssume"><span class="hs-identifier hs-type">CommandAssume</span></a></span><span> </span><span id="local-6989586621679725296"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725296"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725297"><span class="annot"><span class="annottext">[VarIdent' BNFC'Position]
+</span><a href="#local-6989586621679725297"><span class="hs-identifier hs-var">vars</span></a></span></span><span> </span><span id="local-6989586621679725298"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725298"><span class="hs-identifier hs-var">type_</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-40"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">(VarIdent' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [VarIdent' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679725299"><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+</span><a href="#local-6989586621679725299"><span class="hs-identifier hs-var">var</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+</span><a href="#local-6989586621679725299"><span class="hs-identifier hs-var">var</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Parameter</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_Declaration</span></span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[VarIdent' BNFC'Position]
+</span><a href="#local-6989586621679725297"><span class="hs-identifier hs-var">vars</span></a></span><span>
+</span><span id="line-41"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725298"><span class="hs-identifier hs-var">type_</span></a></span><span>
+</span><span id="line-42"></span><span>    </span><span class="hs-special">]</span><span>
+</span><span id="line-43"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CommandSection"><span class="hs-identifier hs-type">CommandSection</span></a></span><span>    </span><span id="local-6989586621679725302"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725302"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725303"><span class="annot"><span class="annottext">SectionName' BNFC'Position
+</span><a href="#local-6989586621679725303"><span class="hs-identifier hs-var">_nameStart</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-44"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CommandSectionEnd"><span class="hs-identifier hs-type">CommandSectionEnd</span></a></span><span> </span><span id="local-6989586621679725305"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725305"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725306"><span class="annot"><span class="annottext">SectionName' BNFC'Position
+</span><a href="#local-6989586621679725306"><span class="hs-identifier hs-var">_nameEnd</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="annot"><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeParam"><span class="hs-identifier hs-type">tokenizeParam</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Param"><span class="hs-identifier hs-type">Param</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenAbsolute</span></span><span class="hs-special">]</span><span>
+</span><span id="line-47"></span><span id="tokenizeParam"><span class="annot"><span class="annottext">tokenizeParam :: Param' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeParam"><span class="hs-identifier hs-var hs-var">tokenizeParam</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-48"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ParamPattern"><span class="hs-identifier hs-type">ParamPattern</span></a></span><span> </span><span id="local-6989586621679725309"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725309"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725310"><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725310"><span class="hs-identifier hs-var">pat</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Pattern -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizePattern"><span class="hs-identifier hs-var">tokenizePattern</span></a></span><span> </span><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725310"><span class="hs-identifier hs-var">pat</span></a></span><span>
+</span><span id="line-49"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ParamPatternType"><span class="hs-identifier hs-type">ParamPatternType</span></a></span><span> </span><span id="local-6989586621679725313"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725313"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725314"><span class="annot"><span class="annottext">[Pattern]
+</span><a href="#local-6989586621679725314"><span class="hs-identifier hs-var">pats</span></a></span></span><span> </span><span id="local-6989586621679725315"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725315"><span class="hs-identifier hs-var">type_</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-50"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">(Pattern -&gt; [SemanticTokenAbsolute])
+-&gt; [Pattern] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Pattern -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizePattern"><span class="hs-identifier hs-var">tokenizePattern</span></a></span><span> </span><span class="annot"><span class="annottext">[Pattern]
+</span><a href="#local-6989586621679725314"><span class="hs-identifier hs-var">pats</span></a></span><span>
+</span><span id="line-51"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725315"><span class="hs-identifier hs-var">type_</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-52"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ParamPatternShape"><span class="hs-identifier hs-type">ParamPatternShape</span></a></span><span> </span><span id="local-6989586621679725317"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725317"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725318"><span class="annot"><span class="annottext">[Pattern]
+</span><a href="#local-6989586621679725318"><span class="hs-identifier hs-var">pats</span></a></span></span><span> </span><span id="local-6989586621679725319"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725319"><span class="hs-identifier hs-var">cube</span></a></span></span><span> </span><span id="local-6989586621679725320"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725320"><span class="hs-identifier hs-var">tope</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-53"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">(Pattern -&gt; [SemanticTokenAbsolute])
+-&gt; [Pattern] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Pattern -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizePattern"><span class="hs-identifier hs-var">tokenizePattern</span></a></span><span> </span><span class="annot"><span class="annottext">[Pattern]
+</span><a href="#local-6989586621679725318"><span class="hs-identifier hs-var">pats</span></a></span><span>
+</span><span id="line-54"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725319"><span class="hs-identifier hs-var">cube</span></a></span><span>
+</span><span id="line-55"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725320"><span class="hs-identifier hs-var">tope</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-56"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ParamPatternShapeDeprecated"><span class="hs-identifier hs-type">ParamPatternShapeDeprecated</span></a></span><span> </span><span id="local-6989586621679725323"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725323"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725324"><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725324"><span class="hs-identifier hs-var">pat</span></a></span></span><span> </span><span id="local-6989586621679725325"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725325"><span class="hs-identifier hs-var">cube</span></a></span></span><span> </span><span id="local-6989586621679725326"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725326"><span class="hs-identifier hs-var">tope</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-57"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Pattern -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizePattern"><span class="hs-identifier hs-var">tokenizePattern</span></a></span><span> </span><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725324"><span class="hs-identifier hs-var">pat</span></a></span><span>
+</span><span id="line-58"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725325"><span class="hs-identifier hs-var">cube</span></a></span><span>
+</span><span id="line-59"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725326"><span class="hs-identifier hs-var">tope</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-60"></span><span>
+</span><span id="line-61"></span><span class="annot"><a href="Language.Rzk.VSCode.Tokenize.html#tokenizePattern"><span class="hs-identifier hs-type">tokenizePattern</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Pattern"><span class="hs-identifier hs-type">Pattern</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenAbsolute</span></span><span class="hs-special">]</span><span>
+</span><span id="line-62"></span><span id="tokenizePattern"><span class="annot"><span class="annottext">tokenizePattern :: Pattern -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizePattern"><span class="hs-identifier hs-var hs-var">tokenizePattern</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-63"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#PatternVar"><span class="hs-identifier hs-type">PatternVar</span></a></span><span> </span><span id="local-6989586621679725328"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725328"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725329"><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+</span><a href="#local-6989586621679725329"><span class="hs-identifier hs-var">var</span></a></span></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+</span><a href="#local-6989586621679725329"><span class="hs-identifier hs-var">var</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Parameter</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_Declaration</span></span><span class="hs-special">]</span><span>
+</span><span id="line-64"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#PatternPair"><span class="hs-identifier hs-type">PatternPair</span></a></span><span> </span><span id="local-6989586621679725331"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725331"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725332"><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725332"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679725333"><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725333"><span class="hs-identifier hs-var">r</span></a></span></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Pattern -&gt; [SemanticTokenAbsolute])
+-&gt; [Pattern] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Pattern -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizePattern"><span class="hs-identifier hs-var">tokenizePattern</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725332"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725333"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-65"></span><span>  </span><span id="local-6989586621679725334"><span class="annot"><span class="annottext">pat :: Pattern
+</span><a href="#local-6989586621679725334"><span class="hs-identifier hs-var">pat</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#PatternUnit"><span class="hs-identifier hs-type">PatternUnit</span></a></span><span> </span><span id="local-6989586621679725336"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725336"><span class="hs-identifier hs-var">_loc</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Pattern
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725334"><span class="hs-identifier hs-var">pat</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_EnumMember</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_Declaration</span></span><span class="hs-special">]</span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span class="annot"><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-type">tokenizeTope</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Term"><span class="hs-identifier hs-type">Term</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenAbsolute</span></span><span class="hs-special">]</span><span>
+</span><span id="line-68"></span><span id="tokenizeTope"><span class="annot"><span class="annottext">tokenizeTope :: Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var hs-var">tokenizeTope</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe SemanticTokenTypes
+-&gt; Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm%27"><span class="hs-identifier hs-var">tokenizeTerm'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SemanticTokenTypes -&gt; Maybe SemanticTokenTypes
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_String</span></span><span class="hs-special">)</span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span class="annot"><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-type">tokenizeTerm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Term"><span class="hs-identifier hs-type">Term</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenAbsolute</span></span><span class="hs-special">]</span><span>
+</span><span id="line-71"></span><span id="tokenizeTerm"><span class="annot"><span class="annottext">tokenizeTerm :: Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var hs-var">tokenizeTerm</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe SemanticTokenTypes
+-&gt; Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm%27"><span class="hs-identifier hs-var">tokenizeTerm'</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe SemanticTokenTypes
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span class="annot"><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm%27"><span class="hs-identifier hs-type">tokenizeTerm'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenTypes</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Term"><span class="hs-identifier hs-type">Term</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenAbsolute</span></span><span class="hs-special">]</span><span>
+</span><span id="line-74"></span><span id="tokenizeTerm%27"><span class="annot"><span class="annottext">tokenizeTerm' :: Maybe SemanticTokenTypes
+-&gt; Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm%27"><span class="hs-identifier hs-var hs-var">tokenizeTerm'</span></a></span></span><span> </span><span id="local-6989586621679725341"><span class="annot"><span class="annottext">Maybe SemanticTokenTypes
+</span><a href="#local-6989586621679725341"><span class="hs-identifier hs-var">varTokenType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span>
+</span><span id="line-75"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-76"></span><span>    </span><span id="local-6989586621679725342"><span class="annot"><span class="annottext">go :: Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679725474"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-77"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Hole"><span class="hs-identifier hs-type">Hole</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-comment">-- FIXME</span><span>
+</span><span id="line-78"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Var"><span class="hs-identifier hs-type">Var</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Maybe SemanticTokenTypes
+</span><a href="#local-6989586621679725341"><span class="hs-identifier hs-var">varTokenType</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-79"></span><span>                 </span><span class="annot"><span class="annottext">Maybe SemanticTokenTypes
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-80"></span><span>                 </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679725477"><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><a href="#local-6989586621679725477"><span class="hs-identifier hs-var">token_type</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><a href="#local-6989586621679725477"><span class="hs-identifier hs-var">token_type</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Universe"><span class="hs-identifier hs-type">Universe</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Class</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-83"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#UniverseCube"><span class="hs-identifier hs-type">UniverseCube</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Class</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-84"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#UniverseTope"><span class="hs-identifier hs-type">UniverseTope</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Class</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CubeUnit"><span class="hs-identifier hs-type">CubeUnit</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Enum</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-87"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CubeUnitStar"><span class="hs-identifier hs-type">CubeUnitStar</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_EnumMember</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-88"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_CubeUnitStar"><span class="hs-identifier hs-type">ASCII_CubeUnitStar</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_EnumMember</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-89"></span><span>
+</span><span id="line-90"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Cube2"><span class="hs-identifier hs-type">Cube2</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Enum</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-91"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Cube2_0"><span class="hs-identifier hs-type">Cube2_0</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_EnumMember</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-92"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_Cube2_0"><span class="hs-identifier hs-type">ASCII_Cube2_0</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_EnumMember</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-93"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Cube2_1"><span class="hs-identifier hs-type">Cube2_1</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_EnumMember</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-94"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_Cube2_1"><span class="hs-identifier hs-type">ASCII_Cube2_1</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_EnumMember</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-95"></span><span>
+</span><span id="line-96"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#CubeProduct"><span class="hs-identifier hs-type">CubeProduct</span></a></span><span> </span><span id="local-6989586621679725493"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725493"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725494"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725494"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679725495"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725495"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725494"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725495"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-97"></span><span>
+</span><span id="line-98"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TopeTop"><span class="hs-identifier hs-type">TopeTop</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_String</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-99"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_TopeTop"><span class="hs-identifier hs-type">ASCII_TopeTop</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_String</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-100"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TopeBottom"><span class="hs-identifier hs-type">TopeBottom</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_String</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-101"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_TopeBottom"><span class="hs-identifier hs-type">ASCII_TopeBottom</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_String</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-102"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TopeAnd"><span class="hs-identifier hs-type">TopeAnd</span></a></span><span> </span><span id="local-6989586621679725501"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725501"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725502"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725502"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679725503"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725503"><span class="hs-identifier hs-var">r</span></a></span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725502"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725503"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-103"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_TopeAnd"><span class="hs-identifier hs-type">ASCII_TopeAnd</span></a></span><span> </span><span id="local-6989586621679725505"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725505"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725506"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725506"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679725507"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725507"><span class="hs-identifier hs-var">r</span></a></span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725506"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725507"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-104"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TopeOr"><span class="hs-identifier hs-type">TopeOr</span></a></span><span>  </span><span id="local-6989586621679725509"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725509"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725510"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725510"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679725511"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725511"><span class="hs-identifier hs-var">r</span></a></span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725510"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725511"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-105"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_TopeOr"><span class="hs-identifier hs-type">ASCII_TopeOr</span></a></span><span>  </span><span id="local-6989586621679725513"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725513"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725514"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725514"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679725515"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725515"><span class="hs-identifier hs-var">r</span></a></span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725514"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725515"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-106"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TopeEQ"><span class="hs-identifier hs-type">TopeEQ</span></a></span><span>  </span><span id="local-6989586621679725517"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725517"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725518"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725518"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679725519"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725519"><span class="hs-identifier hs-var">r</span></a></span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725518"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725519"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-107"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_TopeEQ"><span class="hs-identifier hs-type">ASCII_TopeEQ</span></a></span><span>  </span><span id="local-6989586621679725521"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725521"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725522"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725522"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679725523"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725523"><span class="hs-identifier hs-var">r</span></a></span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725522"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725523"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-108"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TopeLEQ"><span class="hs-identifier hs-type">TopeLEQ</span></a></span><span> </span><span id="local-6989586621679725525"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725525"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725526"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725526"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679725527"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725527"><span class="hs-identifier hs-var">r</span></a></span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725526"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725527"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-109"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_TopeLEQ"><span class="hs-identifier hs-type">ASCII_TopeLEQ</span></a></span><span> </span><span id="local-6989586621679725529"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725529"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725530"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725530"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679725531"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725531"><span class="hs-identifier hs-var">r</span></a></span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725530"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725531"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-110"></span><span>
+</span><span id="line-111"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#RecBottom"><span class="hs-identifier hs-type">RecBottom</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Function</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-112"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#RecOr"><span class="hs-identifier hs-type">RecOr</span></a></span><span> </span><span id="local-6989586621679725534"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725534"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725535"><span class="annot"><span class="annottext">[Restriction' BNFC'Position]
+</span><a href="#local-6989586621679725535"><span class="hs-identifier hs-var">rs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Restriction' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Restriction' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Restriction' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeRestriction"><span class="hs-identifier hs-var">tokenizeRestriction</span></a></span><span> </span><span class="annot"><span class="annottext">[Restriction' BNFC'Position]
+</span><a href="#local-6989586621679725535"><span class="hs-identifier hs-var">rs</span></a></span><span>
+</span><span id="line-113"></span><span>
+</span><span id="line-114"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TypeFun"><span class="hs-identifier hs-type">TypeFun</span></a></span><span> </span><span id="local-6989586621679725538"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725538"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725539"><span class="annot"><span class="annottext">ParamDecl' BNFC'Position
+</span><a href="#local-6989586621679725539"><span class="hs-identifier hs-var">paramDecl</span></a></span></span><span> </span><span id="local-6989586621679725540"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725540"><span class="hs-identifier hs-var">ret</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-115"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">ParamDecl' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeParamDecl"><span class="hs-identifier hs-var">tokenizeParamDecl</span></a></span><span> </span><span class="annot"><span class="annottext">ParamDecl' BNFC'Position
+</span><a href="#local-6989586621679725539"><span class="hs-identifier hs-var">paramDecl</span></a></span><span>
+</span><span id="line-116"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725540"><span class="hs-identifier hs-var">ret</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-117"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_TypeFun"><span class="hs-identifier hs-type">ASCII_TypeFun</span></a></span><span> </span><span id="local-6989586621679725543"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725543"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725544"><span class="annot"><span class="annottext">ParamDecl' BNFC'Position
+</span><a href="#local-6989586621679725544"><span class="hs-identifier hs-var">paramDecl</span></a></span></span><span> </span><span id="local-6989586621679725545"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725545"><span class="hs-identifier hs-var">ret</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-118"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">ParamDecl' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeParamDecl"><span class="hs-identifier hs-var">tokenizeParamDecl</span></a></span><span> </span><span class="annot"><span class="annottext">ParamDecl' BNFC'Position
+</span><a href="#local-6989586621679725544"><span class="hs-identifier hs-var">paramDecl</span></a></span><span>
+</span><span id="line-119"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725545"><span class="hs-identifier hs-var">ret</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-120"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TypeSigma"><span class="hs-identifier hs-type">TypeSigma</span></a></span><span> </span><span id="local-6989586621679725547"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725547"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span id="local-6989586621679725548"><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725548"><span class="hs-identifier hs-var">pat</span></a></span></span><span> </span><span id="local-6989586621679725549"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725549"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679725550"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725550"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-121"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BNFC'Position -&gt; VarIdentToken -&gt; VarIdent' BNFC'Position
+forall a. a -&gt; VarIdentToken -&gt; VarIdent' a
+</span><a href="Language.Rzk.Syntax.Abs.html#VarIdent"><span class="hs-identifier hs-var">VarIdent</span></a></span><span> </span><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725547"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdentToken
+</span><span class="hs-string">&quot;&#8721;&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Class</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-122"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Pattern -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizePattern"><span class="hs-identifier hs-var">tokenizePattern</span></a></span><span> </span><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725548"><span class="hs-identifier hs-var">pat</span></a></span><span>
+</span><span id="line-123"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725549"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725550"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-124"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_TypeSigma"><span class="hs-identifier hs-type">ASCII_TypeSigma</span></a></span><span> </span><span id="local-6989586621679725553"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725553"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span id="local-6989586621679725554"><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725554"><span class="hs-identifier hs-var">pat</span></a></span></span><span> </span><span id="local-6989586621679725555"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725555"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679725556"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725556"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-125"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BNFC'Position -&gt; VarIdentToken -&gt; VarIdent' BNFC'Position
+forall a. a -&gt; VarIdentToken -&gt; VarIdent' a
+</span><a href="Language.Rzk.Syntax.Abs.html#VarIdent"><span class="hs-identifier hs-var">VarIdent</span></a></span><span> </span><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725553"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdentToken
+</span><span class="hs-string">&quot;Sigma&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Class</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-126"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Pattern -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizePattern"><span class="hs-identifier hs-var">tokenizePattern</span></a></span><span> </span><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725554"><span class="hs-identifier hs-var">pat</span></a></span><span>
+</span><span id="line-127"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725555"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725556"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-128"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TypeId"><span class="hs-identifier hs-type">TypeId</span></a></span><span> </span><span id="local-6989586621679725558"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725558"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725559"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725559"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679725560"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725560"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679725561"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725561"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725559"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725560"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725561"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-129"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TypeIdSimple"><span class="hs-identifier hs-type">TypeIdSimple</span></a></span><span> </span><span id="local-6989586621679725563"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725563"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725564"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725564"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679725565"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725565"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725564"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725565"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-130"></span><span>
+</span><span id="line-131"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TypeRestricted"><span class="hs-identifier hs-type">TypeRestricted</span></a></span><span> </span><span id="local-6989586621679725567"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725567"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725568"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725568"><span class="hs-identifier hs-var">type_</span></a></span></span><span> </span><span id="local-6989586621679725569"><span class="annot"><span class="annottext">[Restriction' BNFC'Position]
+</span><a href="#local-6989586621679725569"><span class="hs-identifier hs-var">rs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-132"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725568"><span class="hs-identifier hs-var">type_</span></a></span><span>
+</span><span id="line-133"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Restriction' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Restriction' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Restriction' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeRestriction"><span class="hs-identifier hs-var">tokenizeRestriction</span></a></span><span> </span><span class="annot"><span class="annottext">[Restriction' BNFC'Position]
+</span><a href="#local-6989586621679725569"><span class="hs-identifier hs-var">rs</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-134"></span><span>
+</span><span id="line-135"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#App"><span class="hs-identifier hs-type">App</span></a></span><span> </span><span id="local-6989586621679725571"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725571"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725572"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725572"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679725573"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725573"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725572"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725573"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-136"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Lambda"><span class="hs-identifier hs-type">Lambda</span></a></span><span> </span><span id="local-6989586621679725575"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725575"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725576"><span class="annot"><span class="annottext">[Param' BNFC'Position]
+</span><a href="#local-6989586621679725576"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679725577"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725577"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-137"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">(Param' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Param' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Param' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeParam"><span class="hs-identifier hs-var">tokenizeParam</span></a></span><span> </span><span class="annot"><span class="annottext">[Param' BNFC'Position]
+</span><a href="#local-6989586621679725576"><span class="hs-identifier hs-var">params</span></a></span><span>
+</span><span id="line-138"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725577"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-139"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_Lambda"><span class="hs-identifier hs-type">ASCII_Lambda</span></a></span><span> </span><span id="local-6989586621679725579"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725579"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span id="local-6989586621679725580"><span class="annot"><span class="annottext">[Param' BNFC'Position]
+</span><a href="#local-6989586621679725580"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679725581"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725581"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BNFC'Position
+-&gt; [Param' BNFC'Position]
+-&gt; Term' BNFC'Position
+-&gt; Term' BNFC'Position
+forall a. a -&gt; [Param' a] -&gt; Term' a -&gt; Term' a
+</span><a href="Language.Rzk.Syntax.Abs.html#Lambda"><span class="hs-identifier hs-var">Lambda</span></a></span><span> </span><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725579"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">[Param' BNFC'Position]
+</span><a href="#local-6989586621679725580"><span class="hs-identifier hs-var">params</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725581"><span class="hs-identifier hs-var">body</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-140"></span><span>
+</span><span id="line-141"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Pair"><span class="hs-identifier hs-type">Pair</span></a></span><span> </span><span id="local-6989586621679725583"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725583"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725584"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725584"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679725585"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725585"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725584"><span class="hs-identifier hs-var">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725585"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-142"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#First"><span class="hs-identifier hs-type">First</span></a></span><span> </span><span id="local-6989586621679725587"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725587"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span id="local-6989586621679725588"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725588"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-143"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BNFC'Position -&gt; VarIdentToken -&gt; VarIdent' BNFC'Position
+forall a. a -&gt; VarIdentToken -&gt; VarIdent' a
+</span><a href="Language.Rzk.Syntax.Abs.html#VarIdent"><span class="hs-identifier hs-var">VarIdent</span></a></span><span> </span><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725587"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdentToken
+</span><span class="hs-string">&quot;&#960;&#8321;&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Function</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-144"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725588"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-145"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_First"><span class="hs-identifier hs-type">ASCII_First</span></a></span><span> </span><span id="local-6989586621679725590"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725590"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span id="local-6989586621679725591"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725591"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-146"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BNFC'Position -&gt; VarIdentToken -&gt; VarIdent' BNFC'Position
+forall a. a -&gt; VarIdentToken -&gt; VarIdent' a
+</span><a href="Language.Rzk.Syntax.Abs.html#VarIdent"><span class="hs-identifier hs-var">VarIdent</span></a></span><span> </span><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725590"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdentToken
+</span><span class="hs-string">&quot;first&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Function</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-147"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725591"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-148"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Second"><span class="hs-identifier hs-type">Second</span></a></span><span> </span><span id="local-6989586621679725593"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725593"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span id="local-6989586621679725594"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725594"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-149"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BNFC'Position -&gt; VarIdentToken -&gt; VarIdent' BNFC'Position
+forall a. a -&gt; VarIdentToken -&gt; VarIdent' a
+</span><a href="Language.Rzk.Syntax.Abs.html#VarIdent"><span class="hs-identifier hs-var">VarIdent</span></a></span><span> </span><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725593"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdentToken
+</span><span class="hs-string">&quot;&#960;&#8322;&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Function</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-150"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725594"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-151"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_Second"><span class="hs-identifier hs-type">ASCII_Second</span></a></span><span> </span><span id="local-6989586621679725596"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725596"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span id="local-6989586621679725597"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725597"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-152"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BNFC'Position -&gt; VarIdentToken -&gt; VarIdent' BNFC'Position
+forall a. a -&gt; VarIdentToken -&gt; VarIdent' a
+</span><a href="Language.Rzk.Syntax.Abs.html#VarIdent"><span class="hs-identifier hs-var">VarIdent</span></a></span><span> </span><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725596"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdentToken
+</span><span class="hs-string">&quot;second&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Function</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-153"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725597"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TypeUnit"><span class="hs-identifier hs-type">TypeUnit</span></a></span><span> </span><span id="local-6989586621679725599"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725599"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Enum</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-156"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Unit"><span class="hs-identifier hs-type">Unit</span></a></span><span> </span><span id="local-6989586621679725601"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725601"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_EnumMember</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-157"></span><span>
+</span><span id="line-158"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Refl"><span class="hs-identifier hs-type">Refl</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Function</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-159"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ReflTerm"><span class="hs-identifier hs-type">ReflTerm</span></a></span><span> </span><span id="local-6989586621679725604"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725604"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span id="local-6989586621679725605"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725605"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-160"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BNFC'Position -&gt; VarIdentToken -&gt; VarIdent' BNFC'Position
+forall a. a -&gt; VarIdentToken -&gt; VarIdent' a
+</span><a href="Language.Rzk.Syntax.Abs.html#VarIdent"><span class="hs-identifier hs-var">VarIdent</span></a></span><span> </span><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725604"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdentToken
+</span><span class="hs-string">&quot;refl&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Function</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-161"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725605"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-162"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ReflTermType"><span class="hs-identifier hs-type">ReflTermType</span></a></span><span> </span><span id="local-6989586621679725607"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725607"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span id="local-6989586621679725608"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725608"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679725609"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725609"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-163"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BNFC'Position -&gt; VarIdentToken -&gt; VarIdent' BNFC'Position
+forall a. a -&gt; VarIdentToken -&gt; VarIdent' a
+</span><a href="Language.Rzk.Syntax.Abs.html#VarIdent"><span class="hs-identifier hs-var">VarIdent</span></a></span><span> </span><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725607"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdentToken
+</span><span class="hs-string">&quot;refl&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Function</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-164"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725608"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725609"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-165"></span><span>
+</span><span id="line-166"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#IdJ"><span class="hs-identifier hs-type">IdJ</span></a></span><span> </span><span id="local-6989586621679725611"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725611"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span id="local-6989586621679725612"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725612"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679725613"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725613"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span id="local-6989586621679725614"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725614"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679725615"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725615"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span id="local-6989586621679725616"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725616"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span id="local-6989586621679725617"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725617"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-167"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">VarIdent' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BNFC'Position -&gt; VarIdentToken -&gt; VarIdent' BNFC'Position
+forall a. a -&gt; VarIdentToken -&gt; VarIdent' a
+</span><a href="Language.Rzk.Syntax.Abs.html#VarIdent"><span class="hs-identifier hs-var">VarIdent</span></a></span><span> </span><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725611"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">VarIdentToken
+</span><span class="hs-string">&quot;J&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Function</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_DefaultLibrary</span></span><span class="hs-special">]</span><span>
+</span><span id="line-168"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725612"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725613"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725614"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725615"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725616"><span class="hs-identifier hs-var">e</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725617"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-169"></span><span>
+</span><span id="line-170"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TypeAsc"><span class="hs-identifier hs-type">TypeAsc</span></a></span><span> </span><span id="local-6989586621679725619"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725619"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725620"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725620"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679725621"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725621"><span class="hs-identifier hs-var">type_</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Term' BNFC'Position -&gt; [SemanticTokenAbsolute])
+-&gt; [Term' BNFC'Position] -&gt; [SemanticTokenAbsolute]
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="#local-6989586621679725342"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725620"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725621"><span class="hs-identifier hs-var">type_</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-171"></span><span>
+</span><span id="line-172"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#RecOrDeprecated"><span class="hs-identifier hs-type">RecOrDeprecated</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Regexp</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_Deprecated</span></span><span class="hs-special">]</span><span>
+</span><span id="line-173"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#TypeExtensionDeprecated"><span class="hs-identifier hs-type">TypeExtensionDeprecated</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Regexp</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_Deprecated</span></span><span class="hs-special">]</span><span>
+</span><span id="line-174"></span><span>      </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_TypeExtensionDeprecated"><span class="hs-identifier hs-type">ASCII_TypeExtensionDeprecated</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var">mkToken</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725474"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><span class="hs-identifier hs-var">SemanticTokenTypes_Regexp</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SemanticTokenModifiers
+</span><span class="hs-identifier hs-var">SemanticTokenModifiers_Deprecated</span></span><span class="hs-special">]</span><span>
+</span><span id="line-175"></span><span>
+</span><span id="line-176"></span><span class="annot"><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeRestriction"><span class="hs-identifier hs-type">tokenizeRestriction</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Restriction"><span class="hs-identifier hs-type">Restriction</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenAbsolute</span></span><span class="hs-special">]</span><span>
+</span><span id="line-177"></span><span id="tokenizeRestriction"><span class="annot"><span class="annottext">tokenizeRestriction :: Restriction' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeRestriction"><span class="hs-identifier hs-var hs-var">tokenizeRestriction</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#Restriction"><span class="hs-identifier hs-type">Restriction</span></a></span><span> </span><span id="local-6989586621679725629"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725629"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725630"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725630"><span class="hs-identifier hs-var">tope</span></a></span></span><span> </span><span id="local-6989586621679725631"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725631"><span class="hs-identifier hs-var">term</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-178"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725630"><span class="hs-identifier hs-var">tope</span></a></span><span>
+</span><span id="line-179"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725631"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-180"></span><span class="annot"><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeRestriction"><span class="hs-identifier hs-var">tokenizeRestriction</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ASCII_Restriction"><span class="hs-identifier hs-type">ASCII_Restriction</span></a></span><span> </span><span id="local-6989586621679725633"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725633"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725634"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725634"><span class="hs-identifier hs-var">tope</span></a></span></span><span> </span><span id="local-6989586621679725635"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725635"><span class="hs-identifier hs-var">term</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-181"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725634"><span class="hs-identifier hs-var">tope</span></a></span><span>
+</span><span id="line-182"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725635"><span class="hs-identifier hs-var">term</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-183"></span><span>
+</span><span id="line-184"></span><span class="annot"><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeParamDecl"><span class="hs-identifier hs-type">tokenizeParamDecl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ParamDecl"><span class="hs-identifier hs-type">ParamDecl</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenAbsolute</span></span><span class="hs-special">]</span><span>
+</span><span id="line-185"></span><span id="tokenizeParamDecl"><span class="annot"><span class="annottext">tokenizeParamDecl :: ParamDecl' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeParamDecl"><span class="hs-identifier hs-var hs-var">tokenizeParamDecl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-186"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ParamType"><span class="hs-identifier hs-type">ParamType</span></a></span><span> </span><span id="local-6989586621679725638"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725638"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725639"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725639"><span class="hs-identifier hs-var">type_</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725639"><span class="hs-identifier hs-var">type_</span></a></span><span>
+</span><span id="line-187"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ParamTermType"><span class="hs-identifier hs-type">ParamTermType</span></a></span><span> </span><span id="local-6989586621679725641"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725641"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725642"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725642"><span class="hs-identifier hs-var">pat</span></a></span></span><span> </span><span id="local-6989586621679725643"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725643"><span class="hs-identifier hs-var">type_</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-188"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725642"><span class="hs-identifier hs-var">pat</span></a></span><span>
+</span><span id="line-189"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725643"><span class="hs-identifier hs-var">type_</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-190"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ParamTermShape"><span class="hs-identifier hs-type">ParamTermShape</span></a></span><span> </span><span id="local-6989586621679725645"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725645"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725646"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725646"><span class="hs-identifier hs-var">pat</span></a></span></span><span> </span><span id="local-6989586621679725647"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725647"><span class="hs-identifier hs-var">cube</span></a></span></span><span> </span><span id="local-6989586621679725648"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725648"><span class="hs-identifier hs-var">tope</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-191"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725646"><span class="hs-identifier hs-var">pat</span></a></span><span>
+</span><span id="line-192"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725647"><span class="hs-identifier hs-var">cube</span></a></span><span>
+</span><span id="line-193"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725648"><span class="hs-identifier hs-var">tope</span></a></span><span>
+</span><span id="line-194"></span><span>    </span><span class="hs-special">]</span><span>
+</span><span id="line-195"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ParamTermTypeDeprecated"><span class="hs-identifier hs-type">ParamTermTypeDeprecated</span></a></span><span> </span><span id="local-6989586621679725650"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725650"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725651"><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725651"><span class="hs-identifier hs-var">pat</span></a></span></span><span> </span><span id="local-6989586621679725652"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725652"><span class="hs-identifier hs-var">type_</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-196"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Pattern -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizePattern"><span class="hs-identifier hs-var">tokenizePattern</span></a></span><span> </span><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725651"><span class="hs-identifier hs-var">pat</span></a></span><span>
+</span><span id="line-197"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725652"><span class="hs-identifier hs-var">type_</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-198"></span><span>  </span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#ParamVarShapeDeprecated"><span class="hs-identifier hs-type">ParamVarShapeDeprecated</span></a></span><span> </span><span id="local-6989586621679725654"><span class="annot"><span class="annottext">BNFC'Position
+</span><a href="#local-6989586621679725654"><span class="hs-identifier hs-var">_loc</span></a></span></span><span> </span><span id="local-6989586621679725655"><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725655"><span class="hs-identifier hs-var">pat</span></a></span></span><span> </span><span id="local-6989586621679725656"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725656"><span class="hs-identifier hs-var">cube</span></a></span></span><span> </span><span id="local-6989586621679725657"><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725657"><span class="hs-identifier hs-var">tope</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[SemanticTokenAbsolute]] -&gt; [SemanticTokenAbsolute]
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span>
+</span><span id="line-199"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Pattern -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizePattern"><span class="hs-identifier hs-var">tokenizePattern</span></a></span><span> </span><span class="annot"><span class="annottext">Pattern
+</span><a href="#local-6989586621679725655"><span class="hs-identifier hs-var">pat</span></a></span><span>
+</span><span id="line-200"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTerm"><span class="hs-identifier hs-var">tokenizeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725656"><span class="hs-identifier hs-var">cube</span></a></span><span>
+</span><span id="line-201"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position -&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#tokenizeTope"><span class="hs-identifier hs-var">tokenizeTope</span></a></span><span> </span><span class="annot"><span class="annottext">Term' BNFC'Position
+</span><a href="#local-6989586621679725657"><span class="hs-identifier hs-var">tope</span></a></span><span>
+</span><span id="line-202"></span><span>    </span><span class="hs-special">]</span><span>
+</span><span id="line-203"></span><span>
+</span><span id="line-204"></span><span id="local-6989586621679725184"><span class="annot"><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-type">mkToken</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Language.Rzk.Syntax.Abs.html#HasPosition"><span class="hs-identifier hs-type">HasPosition</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679725184"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Language.Rzk.Syntax.Print.html#Print"><span class="hs-identifier hs-type">Print</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679725184"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679725184"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenTypes</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenModifiers</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenAbsolute</span></span><span class="hs-special">]</span></span><span>
+</span><span id="line-205"></span><span id="mkToken"><span class="annot"><span class="annottext">mkToken :: forall a.
+(HasPosition a, Print a) =&gt;
+a
+-&gt; SemanticTokenTypes
+-&gt; [SemanticTokenModifiers]
+-&gt; [SemanticTokenAbsolute]
+</span><a href="Language.Rzk.VSCode.Tokenize.html#mkToken"><span class="hs-identifier hs-var hs-var">mkToken</span></a></span></span><span> </span><span id="local-6989586621679725675"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679725675"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679725676"><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><a href="#local-6989586621679725676"><span class="hs-identifier hs-var">tokenType</span></a></span></span><span> </span><span id="local-6989586621679725677"><span class="annot"><span class="annottext">[SemanticTokenModifiers]
+</span><a href="#local-6989586621679725677"><span class="hs-identifier hs-var">tokenModifiers</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-206"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">a -&gt; BNFC'Position
+forall a. HasPosition a =&gt; a -&gt; BNFC'Position
+</span><a href="Language.Rzk.Syntax.Abs.html#hasPosition"><span class="hs-identifier hs-var">hasPosition</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679725675"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-207"></span><span>    </span><span class="annot"><span class="annottext">BNFC'Position
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-208"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679725679"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679725679"><span class="hs-identifier hs-var">line</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679725680"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679725680"><span class="hs-identifier hs-var">col</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-209"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SemanticTokenAbsolute</span></span><span>
+</span><span id="line-210"></span><span>        </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">$sel:_tokenType:SemanticTokenAbsolute :: SemanticTokenTypes
+</span><span class="hs-identifier hs-var">_tokenType</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SemanticTokenTypes
+</span><a href="#local-6989586621679725676"><span class="hs-identifier hs-var">tokenType</span></a></span><span>
+</span><span id="line-211"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">$sel:_tokenModifiers:SemanticTokenAbsolute :: [SemanticTokenModifiers]
+</span><span class="hs-identifier hs-var">_tokenModifiers</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[SemanticTokenModifiers]
+</span><a href="#local-6989586621679725677"><span class="hs-identifier hs-var">tokenModifiers</span></a></span><span>
+</span><span id="line-212"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">$sel:_startChar:SemanticTokenAbsolute :: UInt
+</span><span class="hs-identifier hs-var">_startChar</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; UInt
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679725680"><span class="hs-identifier hs-var">col</span></a></span><span> </span><span class="annot"><span class="annottext">UInt -&gt; UInt -&gt; UInt
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">UInt
+</span><span class="hs-number">1</span></span><span>    </span><span class="hs-comment">-- NOTE: 0-indexed output for VS Code</span><span>
+</span><span id="line-213"></span><span>        </span><span class="hs-special">,</span><span>  </span><span class="annot"><span class="annottext">$sel:_line:SemanticTokenAbsolute :: UInt
+</span><span class="hs-identifier hs-var">_line</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; UInt
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679725679"><span class="hs-identifier hs-var">line</span></a></span><span> </span><span class="annot"><span class="annottext">UInt -&gt; UInt -&gt; UInt
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">UInt
+</span><span class="hs-number">1</span></span><span>             </span><span class="hs-comment">-- NOTE: 0-indexed output for VS Code</span><span>
+</span><span id="line-214"></span><span>        </span><span class="hs-special">,</span><span>  </span><span class="annot"><span class="annottext">$sel:_length:SemanticTokenAbsolute :: UInt
+</span><span class="hs-identifier hs-var">_length</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; UInt
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; UInt) -&gt; Int -&gt; UInt
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Int
+forall a. [a] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">Prelude.length</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; [Char]
+forall a. Print a =&gt; a -&gt; [Char]
+</span><a href="Language.Rzk.Syntax.html#printTree"><span class="hs-identifier hs-var">printTree</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679725675"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-215"></span><span>        </span><span class="hs-special">}</span><span>
+</span><span id="line-216"></span><span>        </span><span class="hs-special">]</span><span>
+</span><span id="line-217"></span></pre></body></html>
